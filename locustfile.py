@@ -30,8 +30,8 @@ def cloudaddy():
 def start_testing():
     numberOfConcurrentUsers = request.form['numberOfConcurrentUsers']
     os.environ['numberOfJobsPerUser'] = request.form['numberOfJobsPerUser']
+    os.environ['daysDatesBack'] = request.form['daysDatesBack']
 
-    # TODO: set the custom parameters via environment variables
     locust_parameters = {
         "locust_count": numberOfConcurrentUsers,
         "hatch_rate": numberOfConcurrentUsers
@@ -68,7 +68,7 @@ class WebsiteTasks(TaskSet):
 
     @task
     def report(self):
-        self.client.get("/report?number="+os.environ['numberOfJobsPerUser'])
+        self.client.get("/report?number="+os.environ['numberOfJobsPerUser']+"&dates="+os.environ['daysDatesBack'])
 
     @task
     def about(self):

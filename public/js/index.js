@@ -1,8 +1,23 @@
 $(function() {
   var btnStopTesting = $('#btnStopTesting');
   var btnStartTesting = $('#btnStartTesting');
+  var testingForm = $('#testing-form')[0];
+  var inputNumberOfConcurrentUsers = $(
+    'input[name=numberOfConcurrentUsers]');
+  var inputNumberOfJobsPerUser = $('input[name=numberOfJobsPerUser]');
+  var inputDaysDatesBack = $('input[name=daysDatesBack]');
   var refreshInterval;
   var dataTable;
+
+  $('#preset-scenarios-container > li > a').click(function() {
+    var numUsers = this.attributes["data-user"].value;
+    var numReports = this.attributes["data-reports"].value;
+    var daysDatesBack = this.attributes["data-date-back"].value;
+
+    inputNumberOfConcurrentUsers.val(numUsers);
+    inputNumberOfJobsPerUser.val(numReports);
+    inputDaysDatesBack.val(daysDatesBack);
+  });
 
   btnStopTesting.click(function() {
     $.get('/stop-testing').done(function() {
@@ -13,12 +28,16 @@ $(function() {
     })
   });
 
-  $('#testing-form').submit(function(env) {
+  btnStartTesting.click(function() {
+    if (!testingForm.checkValidity()) {
+      alert('Invalid parameters!');
+      return;
+    }
 
     var formData = {
-      'numberOfConcurrentUsers': $(
-        'input[name=numberOfConcurrentUsers]').val(),
-      'numberOfJobsPerUser': $('input[name=numberOfJobsPerUser]').val()
+      'numberOfConcurrentUsers': inputNumberOfConcurrentUsers.val(),
+      'numberOfJobsPerUser': inputNumberOfJobsPerUser.val(),
+      'daysDatesBack': inputDaysDatesBack.val()
     };
 
     $.post('/start-testing', formData).done(function(data) {
@@ -74,7 +93,9 @@ $(function() {
       }, 2000);
 
     });
+  });
 
-    env.preventDefault();
-  })
+  $(window).on('beforeunload', function() {
+    $.get('/stop-testing');
+  });
 });

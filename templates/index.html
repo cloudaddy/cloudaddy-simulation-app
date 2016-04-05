@@ -35,18 +35,39 @@
     </nav>
     <div class="container">
       <h2>Cloudaddy Load Test Simulation App</h2>
-      <form id="testing-form" action="/start-testing" method="post">
+      <h3>Preset scenarios</h3>
+      <ul id="preset-scenarios-container">
+        <li>
+          <a data-user="3" data-reports="2" data-date-back="10">3 users, 2 reports which date back 10 days</a>
+        </li>
+        <li>
+          <a data-user="10" data-reports="6" data-date-back="30">10 users, 6 reports which date back 30 days</a>
+        </li>
+        <li>
+          <a data-user="17" data-reports="10" data-date-back="60">17 users, 10 reports which date back 60 days</a>
+        </li>
+        <li>
+          <a data-user="24" data-reports="14" data-date-back="90">24 users, 14 reports which date back 90 days</a>
+        </li>
+      </ul>
+      <form id="testing-form" class="form-inline" action="/start-testing" method="post">
         <div class="form-group">
           <label for="numberOfConcurrentUsers">Number of Concurrent Users</label>
-          <input type="number" class="form-control" id="numberOfConcurrentUsers" name="numberOfConcurrentUsers" placeholder="Number of Concurrent Users" value="100">
+          <input type="number" class="form-control" id="numberOfConcurrentUsers" name="numberOfConcurrentUsers" placeholder="Number of Concurrent Users" value="10" required="true">
         </div>
         <div class="form-group">
           <label for="numberOfJobsPerUser">Number of Jobs per User</label>
-          <input type="number" class="form-control" id="numberOfJobsPerUser" name="numberOfJobsPerUser" placeholder="Number of Jobs per User" value="5">
+          <input type="number" class="form-control" id="numberOfJobsPerUser" name="numberOfJobsPerUser" placeholder="Number of Jobs per User" value="5" required="true">
         </div>
-        <button type="submit" id="btnStartTesting" class="btn btn-default">Start Load Testing</button>
-        <button type="button" id="btnStopTesting" class="btn btn-alert" disabled="true">Stop Testing</button>
+        <div class="form-group">
+          <label for="numberOfJobsPerUser">Days dates back</label>
+          <input type="number" class="form-control" id="daysDatesBack" name="daysDatesBack" placeholder="Days dates back" value="30" required="true">
+        </div>
       </form>
+      <div id="button-container">
+        <button type="button" id="btnStartTesting" class="btn btn-primary">Start Load Testing</button>
+        <button type="button" id="btnStopTesting" class="btn btn-danger" disabled="true">Stop Testing</button>
+      </div>
 
       <div id="data-table-container">
         <table id="data-table"></table>

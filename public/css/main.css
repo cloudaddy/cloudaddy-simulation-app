@@ -1,12 +1,17 @@
 body {
   padding-top: 50px;
 }
-
+a {
+  cursor: pointer;
+}
 .logo {
   height: 55px;
   margin-top: -17px;
 }
-
 #data-table-container {
   margin-top: 20px;
+}
+#button-container {
+  margin: 15px;
+  text-align: center;
 }
