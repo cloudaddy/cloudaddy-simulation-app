@@ -54,26 +54,42 @@ class WebsiteTasks(TaskSet):
         # get random valid usernames and passwords
         self.client.post("/login", {
             "username": "user",
-            "password": "password"
-        })
-
+            "password": "user"
+        })    
+    
     @task
     def index(self):
-        with self.client.get("/hello", catch_response=True) as response:
-
-            result = response.content.find("Hello Page")
-
-            if result == -1:
-                response.failure("No access!!!!")
+        with self.client.get("/index", catch_response=True) as response:
+        
+            print "Response status code of index page:", response.status_code    
+            result = response.status_code
+        
+            if result != 200:
+                response.failure("No access to the site")
 
     @task
     def report(self):
-        self.client.get("/report?number="+os.environ['numberOfJobsPerUser']+"&dates="+os.environ['daysDatesBack'])
-
+        with self.client.post("/report", {
+            "prod": "6",
+            "count": os.environ['numberOfJobsPerUser'],
+            "daysOld": os.environ['daysDatesBack']
+        },catch_response=True) as response:
+		    #print(response.content)
+			pass
+   
     @task
-    def about(self):
-        self.client.get("/logout")
-
+    def home_page(self):
+        with self.client.get("/",catch_response=True) as response:
+        
+            print "Response status code of Logout page:", response.status_code    
+            result = response.status_code
+        
+            if result != 200:
+                response.failure("Not yet been logged out")
+    
+    @task
+    def download(self):
+        self.client.get("/download?report=108")
 
 class WebsiteUser(HttpLocust):
     task_set = WebsiteTasks
