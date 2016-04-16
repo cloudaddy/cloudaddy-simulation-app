@@ -11,14 +11,14 @@ my_loader = jinja2.ChoiceLoader([
 ])
 web.app.jinja_loader = my_loader
 
+
 # override the locust web routes
 @web.app.route('/public/<path:path>', methods=['GET'])
 def static_proxy(path):
     return send_from_directory(os.path.join(PROJECT_ROOT, 'public'), path)
 
+
 numberOfJobsPerUser = 0
-
-
 
 
 @web.app.route("/cloudaddy")
@@ -49,47 +49,56 @@ def stop_testing():
 
 
 class WebsiteTasks(TaskSet):
-
     def on_start(self):
         # get random valid usernames and passwords
-        self.client.post("/login", {
+        with self.client.post("/login", {
             "username": "user",
             "password": "user"
-        })    
-    
-    @task
+        }, catch_response=True)as response:
+            print "Response status code of login page:", response.status_code
+            result = response.status_code
+        if "<title>Cloudaddy</title>"  in response.content:
+            print "Logged in successfully"
+
+        else:
+            #print "Invalid credentials"
+            response.failure("Invalid credentials")
+
+    @task(1)
     def index(self):
         with self.client.get("/index", catch_response=True) as response:
-        
-            print "Response status code of index page:", response.status_code    
-            result = response.status_code
-        
-            if result != 200:
-                response.failure("No access to the site")
+            # print response.content
+            print "Response status code of index page:", response.status_code
+            if "<title>generate reports</title>" in response.content:
+                print "Entered Index Page"
+            else:
+               response.failure("valid credentials is required to access the system")
 
-    @task
+    @task(2)
     def report(self):
         with self.client.post("/report", {
-            "prod": "6",
+            "prod": "7",
             "count": os.environ['numberOfJobsPerUser'],
             "daysOld": os.environ['daysDatesBack']
-        },catch_response=True) as response:
-		    #print(response.content)
-			pass
-   
-    @task
+        }, catch_response=True) as response:
+            if "<title>generate reports</title>" in response.content:
+                print "Reported Generated"
+            else:
+                response.failure("Report was not generated")
+    @task(3)
     def home_page(self):
-        with self.client.get("/",catch_response=True) as response:
-        
-            print "Response status code of Logout page:", response.status_code    
+        with self.client.get("/", catch_response=True) as response:
+            print "Response status code of root page:", response.status_code
             result = response.status_code
-        
+
             if result != 200:
                 response.failure("Not yet been logged out")
-    
-    @task
+
+    @task(4)
     def download(self):
         self.client.get("/download?report=108")
+
+
 
 class WebsiteUser(HttpLocust):
     task_set = WebsiteTasks
