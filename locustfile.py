@@ -57,14 +57,13 @@ class WebsiteTasks(TaskSet):
         }, catch_response=True)as response:
             print "Response status code of login page:", response.status_code
             result = response.status_code
-        if "<title>Cloudaddy</title>"  in response.content:
-            print "Logged in successfully"
+            if "<title>Cloudaddy</title>"  in response.content:
+                print "Logged in successfully"
+            else:
+                #print "Invalid credentials"
+                response.failure("Invalid credentials")
 
-        else:
-            #print "Invalid credentials"
-            response.failure("Invalid credentials")
-
-    @task(1)
+    @task
     def index(self):
         with self.client.get("/index", catch_response=True) as response:
             # print response.content
@@ -74,7 +73,7 @@ class WebsiteTasks(TaskSet):
             else:
                response.failure("valid credentials is required to access the system")
 
-    @task(2)
+    @task
     def report(self):
         with self.client.post("/report", {
             "prod": "7",
@@ -85,7 +84,7 @@ class WebsiteTasks(TaskSet):
                 print "Reported Generated"
             else:
                 response.failure("Report was not generated")
-    @task(3)
+    @task
     def home_page(self):
         with self.client.get("/", catch_response=True) as response:
             print "Response status code of root page:", response.status_code
@@ -94,7 +93,7 @@ class WebsiteTasks(TaskSet):
             if result != 200:
                 response.failure("Not yet been logged out")
 
-    @task(4)
+    @task
     def download(self):
         self.client.get("/download?report=108")
 
