@@ -1,5 +1,5 @@
-cloudaddy-simulation-app
-========================
+cloudaddy-load-testing-app
+==========================
 
 How to run
 ----------
