@@ -3,6 +3,29 @@ import os
 import requests
 from flask import render_template, send_from_directory, request
 from locust import HttpLocust, TaskSet, task, web
+import random
+
+
+USER_CREDENTIALS = [
+    ("user4", "user4"),
+    ("user3", "user3"),
+    ("user24", "user24"),
+    ("user5", "user5"),
+    ("user22", "user22"),
+    ("user7", "user7"),
+    ("user38", "user38"),
+    ("user9", "user9"),
+    ("user10", "user10"),
+    ("user11", "user11"),
+    ("user20", "user20"),
+    ("user19", "user19"),
+    ("user37", "user37"),
+    ("user40", "user40"),
+    ("user5", "user5"),
+    ("user6", "user6"),
+    ("user13", "user13"),
+    ("user21", "user21"),
+]
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 my_loader = jinja2.ChoiceLoader([
@@ -51,16 +74,19 @@ def stop_testing():
 class WebsiteTasks(TaskSet):
     def on_start(self):
         # get random valid usernames and passwords
+
+        credentials = random.choice(USER_CREDENTIALS)
+        #print(credentials[0],credentials[1])
         with self.client.post("/login", {
-            "username": "user",
-            "password": "user"
+            "username": credentials[0],
+            "password": credentials[1]
         }, catch_response=True)as response:
-            print "Response status code of login page:", response.status_code
+
+            #print "Response status code of login page:", response.status_code
             result = response.status_code
-            if "<title>Cloudaddy</title>"  in response.content:
+            if "<title>generate reports</title>" in response.content:
                 print "Logged in successfully"
             else:
-                #print "Invalid credentials"
                 response.failure("Invalid credentials")
 
     @task
@@ -68,15 +94,16 @@ class WebsiteTasks(TaskSet):
         with self.client.get("/index", catch_response=True) as response:
             # print response.content
             print "Response status code of index page:", response.status_code
+
             if "<title>generate reports</title>" in response.content:
                 print "Entered Index Page"
             else:
-               response.failure("valid credentials is required to access the system")
+                response.failure("valid credentials is required to access the system")
 
     @task
     def report(self):
         with self.client.post("/report", {
-            "prod": "7",
+            "prod": "1",
             "count": os.environ['numberOfJobsPerUser'],
             "daysOld": os.environ['daysDatesBack']
         }, catch_response=True) as response:
@@ -84,6 +111,7 @@ class WebsiteTasks(TaskSet):
                 print "Reported Generated"
             else:
                 response.failure("Report was not generated")
+
     @task
     def home_page(self):
         with self.client.get("/", catch_response=True) as response:
@@ -96,7 +124,6 @@ class WebsiteTasks(TaskSet):
     @task
     def download(self):
         self.client.get("/download?report=108")
-
 
 
 class WebsiteUser(HttpLocust):
