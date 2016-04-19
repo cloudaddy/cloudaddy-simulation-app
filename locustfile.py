@@ -77,48 +77,49 @@ class WebsiteTasks(TaskSet):
 
         credentials = random.choice(USER_CREDENTIALS)
         #print(credentials[0],credentials[1])
-        with self.client.post("/login", {
+        response = self.client.post("/login", {
             "username": credentials[0],
             "password": credentials[1]
-        }, catch_response=True, verify=False) as response:
+        }, catch_response=True, verify=False)
             #print "Response status code of login page:", response.status_code
 
-            if "<title>generate reports</title>" in response.content:
-                print "Logged in successfully"
-            else:
-                response.failure("Invalid credentials")
+        if "<title>generate reports</title>" in response.content:
+            print "Logged in successfully"
+        else:
+            print response.content
+            response.failure("Invalid credentials")
 
     @task
     def index(self):
-        with self.client.get("/index", catch_response=True, verify=False) as response:
+        response = self.client.get("/index", catch_response=True, verify=False)
             # print response.content
-            print "Response status code of index page:", response.status_code
+        print "Response status code of index page:", response.status_code
 
-            if "<title>generate reports</title>" in response.content:
-                print "Entered Index Page"
-            else:
-                response.failure("valid credentials is required to access the system")
+        if "<title>generate reports</title>" in response.content:
+            print "Entered Index Page"
+        else:
+            response.failure("valid credentials is required to access the system")
 
     @task
     def report(self):
-        with self.client.post("/report", {
+        response = self.client.post("/report", {
             "prod": "1",
             "count": os.environ['numberOfJobsPerUser'],
             "daysOld": os.environ['daysDatesBack']
-        }, catch_response=True, verify=False) as response:
-            if "<title>generate reports</title>" in response.content:
-                print "Reported Generated"
-            else:
-                response.failure("Report was not generated")
+        }, catch_response=True, verify=False)
+        if "<title>generate reports</title>" in response.content:
+            print "Reported Generated"
+        else:
+            response.failure("Report was not generated")
 
     @task
     def home_page(self):
-        with self.client.get("/", catch_response=True, verify=False) as response:
-            print "Response status code of root page:", response.status_code
-            result = response.status_code
+        response = self.client.get("/", catch_response=True, verify=False)
+        print "Response status code of root page:", response.status_code
+        result = response.status_code
 
-            if result != 200:
-                response.failure("Not yet been logged out")
+        if result != 200:
+            response.failure("Not yet been logged out")
 
     @task
     def download(self):
