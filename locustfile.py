@@ -80,7 +80,7 @@ class WebsiteTasks(TaskSet):
         response = self.client.post("/login", {
             "username": credentials[0],
             "password": credentials[1]
-        }, catch_response=True, verify=False)
+        }, verify=False)
             #print "Response status code of login page:", response.status_code
 
         if "<title>generate reports</title>" in response.content:
@@ -91,7 +91,7 @@ class WebsiteTasks(TaskSet):
 
     @task
     def index(self):
-        response = self.client.get("/index", catch_response=True, verify=False)
+        response = self.client.get("/index", verify=False)
             # print response.content
         print "Response status code of index page:", response.status_code
 
@@ -106,7 +106,7 @@ class WebsiteTasks(TaskSet):
             "prod": "1",
             "count": os.environ['numberOfJobsPerUser'],
             "daysOld": os.environ['daysDatesBack']
-        }, catch_response=True, verify=False)
+        }, verify=False)
         if "<title>generate reports</title>" in response.content:
             print "Reported Generated"
         else:
@@ -114,7 +114,7 @@ class WebsiteTasks(TaskSet):
 
     @task
     def home_page(self):
-        response = self.client.get("/", catch_response=True, verify=False)
+        response = self.client.get("/", verify=False)
         print "Response status code of root page:", response.status_code
         result = response.status_code
 
@@ -123,7 +123,7 @@ class WebsiteTasks(TaskSet):
 
     @task
     def download(self):
-        self.client.get("/download?report=108", verify=False)
+        response = self.client.get("/download?report=108", verify=False)
 
 
 class WebsiteUser(HttpLocust):
